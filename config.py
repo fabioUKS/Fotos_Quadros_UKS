@@ -11,4 +11,4 @@ class Config:
     # Upload folder configuration
     # STORAGE_FOLDER = os.path.join(BASE_DIR, 'storage')
     STORAGE_FOLDER = os.path.join('E:\\', 'Fotos Quadros', '2026')
-    MAX_CONTENT_LENGTH = 20 * 1024 * 1024  # 20 MB max limit per request, optional but good
+    MAX_CONTENT_LENGTH = 32 * 1024 * 1024  # 32 MB max limit per request, optional but good
