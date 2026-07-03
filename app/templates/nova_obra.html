@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Nova Obra para {{ cliente.nome }}</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('clientes.nova_obra', id=cliente.id) }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <input type="text" class="form-control" value="{{ cliente.nome }}" disabled>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="nome" class="form-label">Nome da Obra</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required autofocus>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('clientes.visualizar', id=cliente.id) }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

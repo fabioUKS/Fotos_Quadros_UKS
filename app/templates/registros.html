@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Registros Fotográficos</h2>
+    <a href="{{ url_for('registros.novo') }}" class="btn btn-primary">Novo Registro</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Obra</th>
+                        <th>Quadro</th>
+                        <th>Fotos</th>
+                        <th>Data Upload</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro.id }}</td>
+                        <td>{{ registro.obra.cliente.nome }}</td>
+                        <td>{{ registro.obra.nome }}</td>
+                        <td>{{ registro.nome_quadro }}</td>
+                        <td><span class="badge bg-secondary">{{ registro.fotos|length }}</span></td>
+                        <td>{{ registro.data_upload.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('registros.visualizar', id=registro.id) }}" class="btn btn-sm btn-info text-white">Visualizar</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-3">Nenhum registro encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

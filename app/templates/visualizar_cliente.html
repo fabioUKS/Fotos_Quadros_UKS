@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('clientes.listar') }}" class="btn btn-sm btn-outline-secondary mb-3">&larr; Voltar para Clientes</a>
+    <h2>Cliente: {{ cliente.nome }}</h2>
+    <p class="text-muted">Cadastrado em {{ cliente.data_criacao.strftime('%d/%m/%Y %H:%M') }}</p>
+</div>
+
+<hr>
+
+<div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+    <h3>Obras</h3>
+    <a href="{{ url_for('clientes.nova_obra', id=cliente.id) }}" class="btn btn-primary">Nova Obra</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        {% if obras %}
+        <ul class="list-group list-group-flush">
+            {% for obra in obras %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ obra.nome }}
+                <span class="badge bg-secondary rounded-pill">{{ obra.registros|length }} registros</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="p-4 text-center text-muted">
+            Nenhuma obra cadastrada para este cliente.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Registro: {{ registro.nome_quadro }}</h2>
+    <a href="{{ url_for('registros.listar') }}" class="btn btn-outline-secondary">Voltar</a>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <strong>Cliente:</strong> {{ registro.obra.cliente.nome }}
+            </div>
+            <div class="col-md-3">
+                <strong>Obra:</strong> {{ registro.obra.nome }}
+            </div>
+            <div class="col-md-3">
+                <strong>Data Upload:</strong> {{ registro.data_upload.strftime('%d/%m/%Y %H:%M') }}
+            </div>
+            <div class="col-md-3">
+                <strong>Total de Fotos:</strong> {{ registro.fotos|length }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Galeria</h4>
+<div class="row g-3">
+    {% for foto in registro.fotos %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm border-0">
+            <a href="{{ url_for('main.serve_storage', filename=foto.caminho) }}" target="_blank">
+                <img src="{{ url_for('main.serve_storage', filename=foto.caminho) }}" class="card-img-top" alt="{{ foto.nome_arquivo }}" style="object-fit: cover; height: 200px;">
+            </a>
+            <div class="card-body p-2">
+                <p class="card-text small text-truncate m-0" title="{{ foto.nome_arquivo }}">{{ foto.nome_arquivo }}</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted py-4">
+        <p>Nenhuma foto encontrada para este registro.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

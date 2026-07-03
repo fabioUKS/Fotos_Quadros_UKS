@@ -1,0 +1,37 @@
+# Ambiente Virtual
+venv/
+env/
+ENV/
+
+# Python / Compilados
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Flask / Banco de Dados Local
+instance/
+*.sqlite
+*.sqlite3
+*.db
+
+# Armazenamento de Arquivos Locais (Mídias, Uploads)
+# Ignora arquivos gerados/baixados localmente no diretório storage, mas caso 
+# haja alguma estrutura inicial necessária, pode-se manter um .gitkeep dentro dele.
+storage/
+
+# Arquivos de IDE (VSCode, Eclipse, PyCharm)
+.vscode/
+.idea/
+.project
+.pydevproject
+*.swp
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs e outros arquivos temporários
+*.log
+tmp/

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5">Dashboard</h1>
+        <p class="lead">Visão geral do sistema de registros fotográficos.</p>
+    </div>
+</div>
+
+<div class="row text-center">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Clientes</h5>
+                <h2 class="display-4 text-primary">{{ qtd_clientes }}</h2>
+                <a href="{{ url_for('clientes.listar') }}" class="btn btn-outline-primary btn-sm mt-2">Ver clientes</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Quadros Registrados</h5>
+                <h2 class="display-4 text-success">{{ qtd_registros }}</h2>
+                <a href="{{ url_for('registros.listar') }}" class="btn btn-outline-success btn-sm mt-2">Ver registros</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Fotos Armazenadas</h5>
+                <h2 class="display-4 text-info">{{ qtd_fotos }}</h2>
+                <a href="{{ url_for('registros.novo') }}" class="btn btn-outline-info btn-sm mt-2">Novo upload</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

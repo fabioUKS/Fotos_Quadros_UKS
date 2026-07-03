@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Novo Registro Fotográfico</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('registros.novo') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label">Cliente</label>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
+                            <option value="">Selecione um cliente...</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="obra_id" class="form-label">Obra</label>
+                        <select class="form-select" id="obra_id" name="obra_id" required disabled>
+                            <option value="">Primeiro selecione um cliente...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="nome_quadro" class="form-label">Nome do Quadro</label>
+                        <input type="text" class="form-control" id="nome_quadro" name="nome_quadro" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="fotos" class="form-label">Selecione as Fotos</label>
+                        <input class="form-control" type="file" id="fotos" name="fotos" multiple accept="image/*" required>
+                        <div class="form-text">Você pode selecionar múltiplas imagens de uma vez.</div>
+                    </div>
+                    
+                    <!-- Progress Bar (Simple Implementation) -->
+                    <div class="progress mb-4 d-none" id="progressWrapper" style="height: 25px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('registros.listar') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary" id="btnSubmit">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        const btnSubmit = document.getElementById('btnSubmit');
+        const progressWrapper = document.getElementById('progressWrapper');
+        const progressBar = document.getElementById('progressBar');
+        
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Enviando...";
+        progressWrapper.classList.remove('d-none');
+        
+        // Simulação visual simples da barra
+        let width = 0;
+        const interval = setInterval(() => {
+            if (width >= 90) {
+                clearInterval(interval);
+            } else {
+                width += 5;
+                progressBar.style.width = width + '%';
+                progressBar.innerText = width + '%';
+            }
+        }, 100);
+    });
+
+    document.getElementById('cliente_id').addEventListener('change', function() {
+        const clienteId = this.value;
+        const obraSelect = document.getElementById('obra_id');
+        
+        obraSelect.innerHTML = '<option value="">Carregando obras...</option>';
+        obraSelect.disabled = true;
+        
+        if (!clienteId) {
+            obraSelect.innerHTML = '<option value="">Primeiro selecione um cliente...</option>';
+            return;
+        }
+        
+        fetch(`/clientes/${clienteId}/obras/api`)
+            .then(response => response.json())
+            .then(data => {
+                obraSelect.innerHTML = '<option value="">Selecione uma obra...</option>';
+                if (data.length === 0) {
+                    obraSelect.innerHTML = '<option value="">Nenhuma obra cadastrada para este cliente</option>';
+                } else {
+                    data.forEach(obra => {
+                        const option = document.createElement('option');
+                        option.value = obra.id;
+                        option.textContent = obra.nome;
+                        obraSelect.appendChild(option);
+                    });
+                    obraSelect.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao buscar obras:', error);
+                obraSelect.innerHTML = '<option value="">Erro ao carregar obras</option>';
+            });
+    });
+</script>
+{% endblock %}
