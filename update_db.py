@@ -7,7 +7,8 @@ from pathlib import Path
 # ============================================
 # CONFIGURAÇÕES
 # ============================================
-DB_PATH = 'C:/Users/UKS EST/git/Fotos_Quadros_UKS/instance/app.db'
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'instance', 'app.db')
 PASTA_RAIZ = 'E:/Fotos Quadros'
 PASTA_ANO = '2026'
 
