@@ -35,3 +35,6 @@ desktop.ini
 # Logs e outros arquivos temporários
 *.log
 tmp/
+
+# Arquivos adicionais
+ips.txt

@@ -5,6 +5,9 @@ from flask import current_app
 from app import db
 from app.models import Cliente, Obra, RegistroFotografico, Foto
 from app.utils import sanitize_directory_name, sanitize_filename
+import zipfile
+import tempfile
+import shutil
 
 class ClienteService:
     @staticmethod
@@ -97,26 +100,73 @@ class RegistroService:
             original_filename = sanitize_filename(arquivo.filename)
             nome, ext = os.path.splitext(original_filename)
             
-            # Garantir que não sobrescreva
-            final_filename = original_filename
-            caminho_completo = os.path.join(target_dir, final_filename)
-            counter = 1
-            
-            while os.path.exists(caminho_completo):
-                final_filename = f"{nome}_{counter}{ext}"
+            if ext.lower() == '.zip':
+                with tempfile.TemporaryDirectory() as dir_temporario:
+                    caminho_zip_temp = os.path.join(dir_temporario, original_filename)
+                    arquivo.save(caminho_zip_temp)
+                    
+                with zipfile.ZipFile(caminho_zip_temp, 'r') as zip_ref:
+                    zip_ref.extractall(dir_temporario)
+                    for arquivo_zipado in zip_ref.namelist():
+                        arquivo_extraido = os.path.join(dir_temporario, arquivo_zipado)
+                        nome_zip, ext_zip = os.path.splitext(arquivo_zipado)
+                        final_filename = arquivo_zipado
+                        caminho_completo = os.path.join(target_dir, final_filename)
+                        counter = 1
+                        
+                        while os.path.exists(caminho_completo):
+                            final_filename = f"{nome_zip}_{counter}{ext_zip}"
+                            caminho_completo = os.path.join(target_dir, final_filename)
+                            counter += 1
+                    
+                # for root, _, files in os.walk(dir_temporario):
+                    # for extracted_file in files:
+                        # if extracted_file.lower().endswith('.zip') or extracted_file.startswith('.'):
+                            # continue
+                        
+                        # extracted_original = sanitize_filename(extracted_file)
+                        # ext_nome, ext_ext = os.path.splitext(extracted_original)
+                        # final_filename = extracted_original
+                        # caminho_completo = os.path.join(target_dir, final_filename)
+                        # counter = 1
+                        
+                        # while os.path.exists(caminho_completo):
+                            # final_filename = f"{ext_nome}_{counter}{ext_ext}"
+                            # caminho_completo = os.path.join(target_dir, final_filename)
+                            # counter += 1
+                            
+                        shutil.copy2(arquivo_extraido, caminho_completo)
+                        
+                        caminho_relativo = os.path.join(nome_pasta, quadro_dir, final_filename).replace('\\', '/')
+                        foto = Foto(registro_id=registro.id, nome_arquivo=final_filename, caminho=caminho_relativo)
+                        db.session.add(foto)
+                        
+            else:
+                # Garantir que não sobrescreva
+                final_filename = original_filename
                 caminho_completo = os.path.join(target_dir, final_filename)
-                counter += 1
+                counter = 1
                 
-            # Salvar no disco
-            arquivo.save(caminho_completo)
+                while os.path.exists(caminho_completo):
+                    final_filename = f"{nome}_{counter}{ext}"
+                    caminho_completo = os.path.join(target_dir, final_filename)
+                    counter += 1
+                    
+                # Salvar no disco
+                arquivo.save(caminho_completo)
+                
+                # Caminho relativo para facilitar a exibição/armazenamento
+                caminho_relativo = os.path.join(nome_pasta, quadro_dir, final_filename).replace('\\', '/')
+                
+                foto = Foto(registro_id=registro.id, nome_arquivo=final_filename, caminho=caminho_relativo)
+                db.session.add(foto)
+                
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
             
-            # Caminho relativo para facilitar a exibição/armazenamento
-            caminho_relativo = os.path.join(nome_pasta, quadro_dir, final_filename).replace('\\', '/')
-            
-            foto = Foto(registro_id=registro.id, nome_arquivo=final_filename, caminho=caminho_relativo)
-            db.session.add(foto)
-            
-        db.session.commit()
         return registro
         
     @staticmethod
