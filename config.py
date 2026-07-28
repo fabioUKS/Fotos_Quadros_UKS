@@ -10,10 +10,12 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Upload folder configuration
-    # STORAGE_FOLDER = os.path.join(BASE_DIR, 'storage')
     HD_BASE_PATH = 'E:\\Fotos Quadros'
     HD_ACTIVE_YEAR = '2026'
-    STORAGE_FOLDER = os.path.join(HD_BASE_PATH, HD_ACTIVE_YEAR)
+    if os.path.exists(HD_BASE_PATH):
+        STORAGE_FOLDER = os.path.join(HD_BASE_PATH, HD_ACTIVE_YEAR)
+    else:
+        STORAGE_FOLDER = os.path.join(BASE_DIR, 'storage')
     MAX_CONTENT_LENGTH = 1024 * 1024 * 1024  # 1024 MB max limit per request, optional but good
     
     # Authomatic synchronization 
@@ -35,4 +37,8 @@ class Config:
     # Temporary directory
     TEMP_FOLDER = 'temp'
     tempfile.tempdir = os.path.join(STORAGE_FOLDER, TEMP_FOLDER)
-    os.makedirs(TEMP_FOLDER, exist_ok=True)
+    try:
+        os.makedirs(tempfile.tempdir, exist_ok=True)
+    except OSError:
+        tempfile.tempdir = os.path.join(BASE_DIR, 'storage', TEMP_FOLDER)
+        os.makedirs(tempfile.tempdir, exist_ok=True)

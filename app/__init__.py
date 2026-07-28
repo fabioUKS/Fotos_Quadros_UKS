@@ -17,7 +17,10 @@ def create_app(config_class=Config):
     app.register_blueprint(registros_bp, url_prefix='/registros')
 
     # Ensure instance and storage folders exist
-    os.makedirs(app.config['STORAGE_FOLDER'], exist_ok=True)
+    try:
+        os.makedirs(app.config['STORAGE_FOLDER'], exist_ok=True)
+    except OSError:
+        pass
     os.makedirs(os.path.join(app.root_path, '..', 'instance'), exist_ok=True)
 
     with app.app_context():

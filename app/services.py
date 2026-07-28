@@ -105,41 +105,37 @@ class RegistroService:
                     caminho_zip_temp = os.path.join(dir_temporario, original_filename)
                     arquivo.save(caminho_zip_temp)
                     
-                with zipfile.ZipFile(caminho_zip_temp, 'r') as zip_ref:
-                    zip_ref.extractall(dir_temporario)
-                    for arquivo_zipado in zip_ref.namelist():
-                        arquivo_extraido = os.path.join(dir_temporario, arquivo_zipado)
-                        nome_zip, ext_zip = os.path.splitext(arquivo_zipado)
-                        final_filename = arquivo_zipado
-                        caminho_completo = os.path.join(target_dir, final_filename)
-                        counter = 1
-                        
-                        while os.path.exists(caminho_completo):
-                            final_filename = f"{nome_zip}_{counter}{ext_zip}"
-                            caminho_completo = os.path.join(target_dir, final_filename)
-                            counter += 1
+                    with zipfile.ZipFile(caminho_zip_temp, 'r') as zip_ref:
+                        zip_ref.extractall(dir_temporario)
                     
-                # for root, _, files in os.walk(dir_temporario):
-                    # for extracted_file in files:
-                        # if extracted_file.lower().endswith('.zip') or extracted_file.startswith('.'):
-                            # continue
-                        
-                        # extracted_original = sanitize_filename(extracted_file)
-                        # ext_nome, ext_ext = os.path.splitext(extracted_original)
-                        # final_filename = extracted_original
-                        # caminho_completo = os.path.join(target_dir, final_filename)
-                        # counter = 1
-                        
-                        # while os.path.exists(caminho_completo):
-                            # final_filename = f"{ext_nome}_{counter}{ext_ext}"
-                            # caminho_completo = os.path.join(target_dir, final_filename)
-                            # counter += 1
+                    for root, _, files in os.walk(dir_temporario):
+                        for extracted_file in files:
+                            # Ignorar o próprio arquivo zip original e arquivos ocultos do SO
+                            if extracted_file.lower().endswith('.zip') or extracted_file.startswith('.'):
+                                continue
                             
-                        shutil.copy2(arquivo_extraido, caminho_completo)
-                        
-                        caminho_relativo = os.path.join(nome_pasta, quadro_dir, final_filename).replace('\\', '/')
-                        foto = Foto(registro_id=registro.id, nome_arquivo=final_filename, caminho=caminho_relativo)
-                        db.session.add(foto)
+                            caminho_arquivo_extraido = os.path.join(root, extracted_file)
+                            
+                            if os.path.isdir(caminho_arquivo_extraido):
+                                continue
+                                
+                            extracted_original = sanitize_filename(extracted_file)
+                            ext_nome, ext_ext = os.path.splitext(extracted_original)
+                            
+                            final_filename = extracted_original
+                            caminho_completo = os.path.join(target_dir, final_filename)
+                            counter = 1
+                            
+                            while os.path.exists(caminho_completo):
+                                final_filename = f"{ext_nome}_{counter}{ext_ext}"
+                                caminho_completo = os.path.join(target_dir, final_filename)
+                                counter += 1
+                                
+                            shutil.copy2(caminho_arquivo_extraido, caminho_completo)
+                            
+                            caminho_relativo = os.path.join(nome_pasta, quadro_dir, final_filename).replace('\\', '/')
+                            foto = Foto(registro_id=registro.id, nome_arquivo=final_filename, caminho=caminho_relativo)
+                            db.session.add(foto)
                         
             else:
                 # Garantir que não sobrescreva
